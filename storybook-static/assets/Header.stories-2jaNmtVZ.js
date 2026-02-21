@@ -1,0 +1,11 @@
+import{j as e}from"./jsx-runtime-D_zvdyIk.js";import{D as d}from"./DocumentTitle-xTVp9Gc5.js";import{C as i}from"./ConnectionStatus-CYrGg_WG.js";import{U as p}from"./UndoRedo-D3HrfqEp.js";import{u as l}from"./useUIStore-DaRkvkcb.js";import{c}from"./createLucideIcon-Djn2jL0E.js";import"./index-ZH-6pyQh.js";import"./_commonjsHelpers-CqkleIqs.js";import"./useNetworkSim-RERlBAN6.js";import"./react-D996PLU5.js";import"./yjsSetup-T-58e8ju.js";/**
+ * @license lucide-react v0.575.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const u=[["path",{d:"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401",key:"kfwtm"}]],h=c("moon",u);/**
+ * @license lucide-react v0.575.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const x=[["circle",{cx:"12",cy:"12",r:"4",key:"4exip2"}],["path",{d:"M12 2v2",key:"tus03m"}],["path",{d:"M12 20v2",key:"1lh1kg"}],["path",{d:"m4.93 4.93 1.41 1.41",key:"149t6j"}],["path",{d:"m17.66 17.66 1.41 1.41",key:"ptbguv"}],["path",{d:"M2 12h2",key:"1t8f8n"}],["path",{d:"M20 12h2",key:"1q8mjw"}],["path",{d:"m6.34 17.66-1.41 1.41",key:"1m8zz5"}],["path",{d:"m19.07 4.93-1.41 1.41",key:"1shlcs"}]],f=c("sun",x);function m(){const{isDarkMode:o,toggleDarkMode:n}=l();return e.jsxs("header",{className:"flex items-center justify-between px-4 h-14 border-b border-vercel-border bg-vercel-black shrink-0",children:[e.jsx(d,{}),e.jsxs("div",{className:"flex items-center gap-4",children:[e.jsx(i,{}),e.jsx(p,{}),e.jsx("button",{onClick:n,className:"p-1.5 text-vercel-muted hover:text-vercel-text hover:bg-vercel-gray-light rounded-md transition-colors",title:o?"Passer en mode clair":"Passer en mode sombre",children:o?e.jsx(f,{size:16}):e.jsx(h,{size:16})})]})]})}m.__docgenInfo={description:"",methods:[],displayName:"Header"};const C={title:"Components/Header",component:m,parameters:{layout:"fullscreen"}},t={};var r,s,a;t.parameters={...t.parameters,docs:{...(r=t.parameters)==null?void 0:r.docs,source:{originalSource:"{}",...(a=(s=t.parameters)==null?void 0:s.docs)==null?void 0:a.source}}};const S=["Default"];export{t as Default,S as __namedExportsOrder,C as default};
