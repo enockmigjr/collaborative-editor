@@ -4,7 +4,7 @@ import { UndoRedo } from './UndoRedo'
 const meta: Meta<typeof UndoRedo> = {
   component: UndoRedo,
   title: 'Header/UndoRedo',
-  parameters: { layout: 'centered' }
+  parameters: { layout: 'centered' },
 }
 export default meta
 

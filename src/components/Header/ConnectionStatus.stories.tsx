@@ -4,7 +4,7 @@ import { ConnectionStatus } from './ConnectionStatus'
 const meta: Meta<typeof ConnectionStatus> = {
   component: ConnectionStatus,
   title: 'Header/ConnectionStatus',
-  parameters: { layout: 'centered' }
+  parameters: { layout: 'centered' },
 }
 export default meta
 

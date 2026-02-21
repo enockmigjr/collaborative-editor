@@ -13,7 +13,11 @@ describe('useLogsStore', () => {
 
   it('should add log', () => {
     useLogsStore.getState().addLog({
-      userId: '1', userName: 'Test', userColor: '#000', type: 'insert', details: 'Added text'
+      userId: '1',
+      userName: 'Test',
+      userColor: '#000',
+      type: 'insert',
+      details: 'Added text',
     })
     const logs = useLogsStore.getState().logs
     expect(logs.length).toBe(1)

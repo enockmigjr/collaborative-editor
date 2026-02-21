@@ -4,7 +4,7 @@ import { LatencyBadge } from './LatencyBadge'
 const meta: Meta<typeof LatencyBadge> = {
   component: LatencyBadge,
   title: 'Editor/LatencyBadge',
-  parameters: { layout: 'centered' }
+  parameters: { layout: 'centered' },
 }
 export default meta
 

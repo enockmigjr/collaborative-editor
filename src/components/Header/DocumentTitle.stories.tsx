@@ -6,7 +6,7 @@ const meta: Meta<typeof DocumentTitle> = {
   title: 'Header/DocumentTitle',
   parameters: {
     layout: 'centered',
-  }
+  },
 }
 export default meta
 

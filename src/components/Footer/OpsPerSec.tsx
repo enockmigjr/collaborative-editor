@@ -3,7 +3,7 @@ import { useLogsStore } from '@/store/useLogsStore'
 
 export function OpsPerSec() {
   const [opsPerSec, setOpsPerSec] = useState(0)
-  
+
   useEffect(() => {
     let lastOps = useLogsStore.getState().totalOps
     const interval = setInterval(() => {

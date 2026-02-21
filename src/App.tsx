@@ -41,15 +41,30 @@ const App = () => {
     <div className="flex flex-col h-dvh w-full bg-vercel-black text-vercel-text overflow-hidden selection:bg-vercel-accent/30 selection:text-white">
       <Header />
       <main className="flex flex-col lg:flex-row flex-1 overflow-hidden relative">
-        <div className={clsx("w-full lg:w-64 shrink-0 lg:flex h-full", activeMobileTab === 'users' ? 'flex' : 'hidden')}>
+        <div
+          className={clsx(
+            'w-full lg:w-64 shrink-0 lg:flex h-full',
+            activeMobileTab === 'users' ? 'flex' : 'hidden'
+          )}
+        >
           <LeftPanel />
         </div>
-        
-        <div className={clsx("flex-1 bg-vercel-black lg:flex h-full min-w-0 flex-col", activeMobileTab === 'editor' ? 'flex' : 'hidden')}>
+
+        <div
+          className={clsx(
+            'flex-1 bg-vercel-black lg:flex h-full min-w-0 flex-col',
+            activeMobileTab === 'editor' ? 'flex' : 'hidden'
+          )}
+        >
           <Editor />
         </div>
 
-        <div className={clsx("w-full lg:w-72 shrink-0 lg:flex h-full", activeMobileTab === 'activity' ? 'flex' : 'hidden')}>
+        <div
+          className={clsx(
+            'w-full lg:w-72 shrink-0 lg:flex h-full',
+            activeMobileTab === 'activity' ? 'flex' : 'hidden'
+          )}
+        >
           <RightPanel currentUser={currentUser} />
         </div>
       </main>

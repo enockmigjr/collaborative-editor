@@ -10,10 +10,10 @@ import type { User, OperationType } from '@/types'
 /**
  * @file useCollaboration.ts
  * @description Hook de chef d'orchestre pour le système Yjs.
- * Initie le document, attache l'Awareness et le MockNetworkProvider, 
- * lie le journal d'activité (logs store) aux événements Y.Text, 
+ * Initie le document, attache l'Awareness et le MockNetworkProvider,
+ * lie le journal d'activité (logs store) aux événements Y.Text,
  * et lance/arrête les bots.
- * 
+ *
  * @param currentUser - l'utilisateur courant local pour le filtrage
  * @returns { localDoc, awareness, provider } utiles à y-codemirror
  */
@@ -60,15 +60,18 @@ export const useCollaboration = (currentUser: User) => {
       if (count > 0) {
         const isLocal = transaction.local
         let originId = String(transaction.origin)
-        
+
         if (isLocal) {
           originId = currentUser.id
           awareness.setLocalStateField('isTyping', true)
           const existing = typingTimeouts.get(currentUser.id)
           if (existing) clearTimeout(existing)
-          typingTimeouts.set(currentUser.id, setTimeout(() => {
-            awareness.setLocalStateField('isTyping', false)
-          }, 1500))
+          typingTimeouts.set(
+            currentUser.id,
+            setTimeout(() => {
+              awareness.setLocalStateField('isTyping', false)
+            }, 1500)
+          )
         }
 
         let userName = currentUser.name

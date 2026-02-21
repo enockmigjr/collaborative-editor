@@ -2,26 +2,65 @@ import * as Y from 'yjs'
 
 const WORDS = [
   // Stack actuel
-  'React', 'Vite', 'TypeScript', 'Yjs', 'CodeMirror', 'Zustand', 'Tailwind', 'PNPM', 'Vitest', 'Storybook', 
+  'React',
+  'Vite',
+  'TypeScript',
+  'Yjs',
+  'CodeMirror',
+  'Zustand',
+  'Tailwind',
+  'PNPM',
+  'Vitest',
+  'Storybook',
 
   // Concepts de collaboration & Algorithmes
-  'collaboratif', 'temps réel', 'latence', 'CRDT', 'synchronisation', 'conflits', 'opérations', 
-  'WebSocket', 'WebRTC', 'persistance', 'awareness', 'curseur', 'édition',
+  'collaboratif',
+  'temps réel',
+  'latence',
+  'CRDT',
+  'synchronisation',
+  'conflits',
+  'opérations',
+  'WebSocket',
+  'WebRTC',
+  'persistance',
+  'awareness',
+  'curseur',
+  'édition',
 
   // Performance & Sécurité
-  'performances', 'optimisation', 'sécurité', 'chiffrement', 'authentification', 'scalabilité', 
-  'debounce', 'throttle', 'mémoire', 'profiler', 'bundle', 'audit',
+  'performances',
+  'optimisation',
+  'sécurité',
+  'chiffrement',
+  'authentification',
+  'scalabilité',
+  'debounce',
+  'throttle',
+  'mémoire',
+  'profiler',
+  'bundle',
+  'audit',
 
   // Contexte Projet & Divers
-  'intéressant', 'test', 'NiyiExpertise', 'développement', 'interface', 'composant', 
-  'modulaire', 'robuste', 'fluide', 'innovation', 'expert'
-];
+  'intéressant',
+  'test',
+  'NiyiExpertise',
+  'développement',
+  'interface',
+  'composant',
+  'modulaire',
+  'robuste',
+  'fluide',
+  'innovation',
+  'expert',
+]
 export const randomWord = () => WORDS[Math.floor(Math.random() * WORDS.length)] + ' '
 
 /**
  * Exécute une action aléatoire (insertion ou suppression de texte)
  * pour un bot donné.
- * 
+ *
  * @param doc - Document Yjs du bot.
  * @param originId - Identifiant unique du bot (utilisé comme origin pour le filtrage).
  */

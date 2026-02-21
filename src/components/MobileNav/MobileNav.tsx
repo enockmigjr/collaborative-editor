@@ -21,8 +21,10 @@ export function MobileNav() {
             key={tab.id}
             onClick={() => setActiveMobileTab(tab.id)}
             className={clsx(
-              "flex flex-col items-center justify-center w-full h-full gap-1 transition-colors",
-              isActive ? "text-vercel-text" : "text-vercel-muted hover:text-vercel-text hover:bg-vercel-gray-light"
+              'flex flex-col items-center justify-center w-full h-full gap-1 transition-colors',
+              isActive
+                ? 'text-vercel-text'
+                : 'text-vercel-muted hover:text-vercel-text hover:bg-vercel-gray-light'
             )}
           >
             <Icon size={20} />

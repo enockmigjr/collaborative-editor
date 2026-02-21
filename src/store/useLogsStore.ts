@@ -25,9 +25,10 @@ export const useLogsStore = create<LogsState>((set) => ({
         ...state.logs,
       ].slice(0, 100), // Garde les 100 derniers logs
     })),
-  incrementTotalOps: (userId) => set((state) => ({ 
-    totalOps: state.totalOps + 1,
-    userOps: { ...state.userOps, [userId]: (state.userOps[userId] || 0) + 1 }
-  })),
+  incrementTotalOps: (userId) =>
+    set((state) => ({
+      totalOps: state.totalOps + 1,
+      userOps: { ...state.userOps, [userId]: (state.userOps[userId] || 0) + 1 },
+    })),
   clearLogs: () => set({ logs: [], totalOps: 0, userOps: {} }),
 }))

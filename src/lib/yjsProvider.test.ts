@@ -25,45 +25,45 @@ describe('MockNetworkProvider', () => {
   })
 
   it('should propagate local updates to shared doc', () => {
-    const provider = new MockNetworkProvider(localDoc, sharedDoc, awareness, callbacks, { 
-      minLatencyMs: 0, 
-      maxLatencyMs: 0, 
-      packetLossRate: 0 
+    const provider = new MockNetworkProvider(localDoc, sharedDoc, awareness, callbacks, {
+      minLatencyMs: 0,
+      maxLatencyMs: 0,
+      packetLossRate: 0,
     })
-    
+
     localDoc.getText('codemirror').insert(0, 'hello')
-    
+
     vi.runAllTimers()
-    
+
     expect(sharedDoc.getText('codemirror').toString()).toBe('hello')
     expect(callbacks.onStatusChange).toHaveBeenCalledWith('syncing')
     provider.destroy()
   })
-  
+
   it('should propagate remote updates to local doc', () => {
-    const provider = new MockNetworkProvider(localDoc, sharedDoc, awareness, callbacks, { 
-      minLatencyMs: 0, 
-      maxLatencyMs: 0, 
-      packetLossRate: 0 
+    const provider = new MockNetworkProvider(localDoc, sharedDoc, awareness, callbacks, {
+      minLatencyMs: 0,
+      maxLatencyMs: 0,
+      packetLossRate: 0,
     })
-    
+
     sharedDoc.getText('codemirror').insert(0, 'world')
-    
+
     vi.runAllTimers()
-    
+
     expect(localDoc.getText('codemirror').toString()).toBe('world')
     provider.destroy()
   })
 
   it('should simulate packet loss', () => {
-    const provider = new MockNetworkProvider(localDoc, sharedDoc, awareness, callbacks, { 
-      minLatencyMs: 0, 
-      maxLatencyMs: 0, 
-      packetLossRate: 1 // 100% perte de packet
+    const provider = new MockNetworkProvider(localDoc, sharedDoc, awareness, callbacks, {
+      minLatencyMs: 0,
+      maxLatencyMs: 0,
+      packetLossRate: 1, // 100% perte de packet
     })
-    
+
     localDoc.getText('codemirror').insert(0, 'lost')
-    
+
     // Au moment de la perte du paquet, il ne devrait rien y avoir
     vi.advanceTimersByTime(100)
     expect(sharedDoc.getText('codemirror').toString()).toBe('')

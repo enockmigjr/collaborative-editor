@@ -12,7 +12,9 @@ export function ConnectionStatus() {
 
       <span className="text-vercel-muted capitalize hidden sm:inline">{status}</span>
       {status === 'connected' && (
-        <span className="text-xs text-vercel-muted hidden sm:inline">(<span translate="no">{latencyMs}</span>ms)</span>
+        <span className="text-xs text-vercel-muted hidden sm:inline">
+          (<span translate="no">{latencyMs}</span>ms)
+        </span>
       )}
     </div>
   )

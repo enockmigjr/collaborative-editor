@@ -9,7 +9,7 @@ export function LeftPanel() {
     const updateUsers = () => {
       const states = Array.from(awareness.getStates().values())
       const users = states.map((state) => state.user as User).filter(Boolean)
-      
+
       setActiveUsers((prev) => {
         if (prev.length !== users.length) return users
         const isSame = prev.every((p, i) => p.id === users[i].id)
@@ -32,10 +32,7 @@ export function LeftPanel() {
       <div className="flex-1 overflow-y-auto p-2 scrollbar-thin">
         <div className="flex flex-col gap-1">
           {activeUsers.map((user) => (
-            <UserCard 
-              key={user.id} 
-              user={user} 
-            />
+            <UserCard key={user.id} user={user} />
           ))}
         </div>
       </div>

@@ -7,7 +7,7 @@ const dummyUser = { id: '1', name: 'Moi', color: '#000', avatar: '', isLocal: tr
 const meta: Meta<typeof RightPanel> = {
   component: RightPanel,
   title: 'RightPanel/RightPanel',
-  parameters: { layout: 'centered' }
+  parameters: { layout: 'centered' },
 }
 export default meta
 
@@ -15,6 +15,6 @@ type Story = StoryObj<typeof RightPanel>
 
 export const Default: Story = {
   args: {
-    currentUser: dummyUser
-  }
+    currentUser: dummyUser,
+  },
 }

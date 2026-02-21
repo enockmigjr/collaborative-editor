@@ -26,7 +26,6 @@ export const Default: Story = {
   },
 }
 
-
 export const Local: Story = {
   args: {
     user: { ...mockUser, name: 'Moi', isLocal: true },

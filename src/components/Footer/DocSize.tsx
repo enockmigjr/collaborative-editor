@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import { localDoc } from '@/lib/yjsSetup'
 
 export function DocSize() {
-  const [docSize, setDocSize] = useState(() => 
-    new Blob([localDoc.getText('codemirror').toString()]).size
+  const [docSize, setDocSize] = useState(
+    () => new Blob([localDoc.getText('codemirror').toString()]).size
   )
 
   useEffect(() => {

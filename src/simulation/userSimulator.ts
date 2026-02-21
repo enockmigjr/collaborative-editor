@@ -18,7 +18,7 @@ export const BOTS = [createBot(), createBot(), createBot()]
  * Lance la simulation multi-utilisateurs.
  * Pour chaque bot, crée un doc Yjs local synchronisé instantanément avec le sharedDoc,
  * et une instance Awareness dont les updates sont propagées vers l'awareness public.
- * 
+ *
  * @param sharedDoc - Document partagé central simulant un backend.
  * @param publicAwareness - Instance Awareness principale connectée à l'UI.
  * @returns Fonction de nettoyage pour interrompre les intervals et détruire les documents virtuels.
@@ -81,19 +81,32 @@ export const startBotSimulation = (sharedDoc: Y.Doc, publicAwareness: Awareness)
         const ytext = botDoc.getText('codemirror')
         const pos = ytext.length > 0 ? Math.floor(Math.random() * ytext.length) : 0
         const relativePos = Y.createRelativePositionFromTypeIndex(ytext, pos)
-        
+
         botAwareness.setLocalStateField('cursor', { anchor: relativePos, head: relativePos })
 
         // 10% de chance d'envoyer un message au chat
         if (Math.random() < 0.1) {
-          const ychat = sharedDoc.getArray<{ id: string; text: string; user: string; time: string }>('chat')
-          const messages = ['Super travail !', 'Je viens de modifier.', 'Attention conflict.', '+1', 'Hello :)']
-          ychat.push([{
-            id: Math.random().toString(),
-            text: messages[Math.floor(Math.random() * messages.length)],
-            user: bot.name,
-            time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
-          }])
+          const ychat = sharedDoc.getArray<{
+            id: string
+            text: string
+            user: string
+            time: string
+          }>('chat')
+          const messages = [
+            'Super travail !',
+            'Je viens de modifier.',
+            'Attention conflict.',
+            '+1',
+            'Hello :)',
+          ]
+          ychat.push([
+            {
+              id: Math.random().toString(),
+              text: messages[Math.floor(Math.random() * messages.length)],
+              user: bot.name,
+              time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+            },
+          ])
         }
       },
       2000 + Math.random() * 3000

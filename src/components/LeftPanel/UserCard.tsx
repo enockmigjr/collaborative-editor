@@ -18,7 +18,7 @@ export const UserCard = memo(({ user }: UserCardProps) => {
       const state = states.find((s) => s.user && s.user.id === user.id)
       setIsTyping(!!state?.isTyping)
     }
-    
+
     checkTyping()
     awareness.on('update', checkTyping)
     return () => awareness.off('update', checkTyping)

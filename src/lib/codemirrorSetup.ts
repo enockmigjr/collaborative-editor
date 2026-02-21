@@ -9,6 +9,11 @@ export const createEditorState = (extensions: Extension[] = []) => {
 
   return EditorState.create({
     doc: ytext.toString(),
-    extensions: [basicSetup, EditorView.lineWrapping, yCollab(ytext, awareness, { undoManager }), ...extensions],
+    extensions: [
+      basicSetup,
+      EditorView.lineWrapping,
+      yCollab(ytext, awareness, { undoManager }),
+      ...extensions,
+    ],
   })
 }
