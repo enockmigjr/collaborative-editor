@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Collaborative Editor — Spec Technique</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600&family=Geist:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --bg: #0a0a0a;
+            --surface: #111111;
+            --surface-2: #1a1a1a;
+            --border: #2a2a2a;
+            --border-subtle: #1f1f1f;
+            --text: #f5f5f5;
+            --text-muted: #a3a3a3;
+            --text-faint: #737373;
+            --accent: #ffffff;
+            --accent-dim: #ededed;
+            --green: #4ade80;
+            --blue: #60a5fa;
+            --yellow: #facc15;
+            --red: #f87171;
+            --purple: #a78bfa;
+            --mono: 'Geist Mono', 'Fira Code', monospace;
+            --sans: 'Geist', -apple-system, sans-serif;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            font-size: 14px;
+            line-height: 1.6;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── LAYOUT ─────────────────────────────────────── */
+        .wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ── TOPBAR ─────────────────────────────────────── */
+        .topbar {
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(12px);
+            z-index: 100;
+        }
+
+        .topbar-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 20px;
+            height: 20px;
+            background: var(--accent);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        .topbar-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+            font-family: var(--mono);
+        }
+
+        .topbar-title span {
+            color: var(--text);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-family: var(--mono);
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            background: var(--surface);
+        }
+
+        .badge.green {
+            border-color: #166534;
+            color: var(--green);
+            background: #052e16;
+        }
+
+        .badge.blue {
+            border-color: #1e3a5f;
+            color: var(--blue);
+            background: #0c1e35;
+        }
+
+        .badge-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        /* ── HERO ───────────────────────────────────────── */
+        .hero {
+            padding: 80px 0 60px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hero-label {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-faint);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 20px;
+        }
+
+        .hero-title {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            color: var(--accent);
+            margin-bottom: 16px;
+        }
+
+        .hero-title em {
+            font-style: normal;
+            color: var(--text-muted);
+        }
+
+        .hero-sub {
+            font-size: 15px;
+            color: var(--text-muted);
+            max-width: 560px;
+            line-height: 1.7;
+            margin-bottom: 32px;
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* ── SECTION ────────────────────────────────────── */
+        .section {
+            padding: 56px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: baseline;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .section-num {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-faint);
+            min-width: 24px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: var(--text);
+        }
+
+        .section-body {
+            padding-left: 40px;
+        }
+
+        /* ── TABLE ──────────────────────────────────────── */
+        .stack-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .stack-item {
+            background: var(--surface);
+            padding: 14px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            transition: background 0.15s;
+        }
+
+        .stack-item:hover {
+            background: var(--surface-2);
+        }
+
+        .stack-cat {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--text-faint);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .stack-val {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .stack-reason {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* ── FILE TREE ──────────────────────────────────── */
+        .filetree {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .filetree-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .filetree-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .filetree-title {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-left: auto;
+        }
+
+        .filetree pre {
+            font-family: var(--mono);
+            font-size: 12px;
+            line-height: 1.8;
+            padding: 20px 24px;
+            color: var(--text-muted);
+            overflow-x: auto;
+        }
+
+        .filetree pre .dir {
+            color: var(--blue);
+        }
+
+        .filetree pre .file {
+            color: var(--text-muted);
+        }
+
+        .filetree pre .comment {
+            color: var(--text-faint);
+        }
+
+        .filetree pre .key {
+            color: var(--green);
+        }
+
+        /* ── CODE BLOCK ─────────────────────────────────── */
+        .codeblock {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .codeblock-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .codeblock-filename {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .codeblock-lang {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--text-faint);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .codeblock pre {
+            font-family: var(--mono);
+            font-size: 12px;
+            line-height: 1.75;
+            padding: 20px 24px;
+            overflow-x: auto;
+            color: #cdd6f4;
+        }
+
+        /* Syntax highlight manual */
+        .kw {
+            color: #cba6f7;
+        }
+
+        .str {
+            color: #a6e3a1;
+        }
+
+        .cm {
+            color: #585b70;
+            font-style: italic;
+        }
+
+        .num {
+            color: #fab387;
+        }
+
+        .fn {
+            color: #89b4fa;
+        }
+
+        .ty {
+            color: #f38ba8;
+        }
+
+        .prop {
+            color: #89dceb;
+        }
+
+        /* ── FEATURE LIST ───────────────────────────────── */
+        .feature-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            transition: border-color 0.15s, background 0.15s;
+        }
+
+        .feature-item:hover {
+            background: var(--surface);
+            border-color: var(--border);
+        }
+
+        .feature-icon {
+            font-size: 13px;
+            margin-top: 1px;
+            flex-shrink: 0;
+        }
+
+        .feature-text {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .feature-text strong {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        /* ── TIMELINE ───────────────────────────────────── */
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 20px;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-subtle);
+            position: relative;
+        }
+
+        .timeline-item:last-child {
+            border-bottom: none;
+        }
+
+        .timeline-left {
+            flex-shrink: 0;
+            width: 80px;
+        }
+
+        .timeline-day {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-faint);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding-top: 2px;
+        }
+
+        .timeline-hours {
+            font-family: var(--mono);
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-faint);
+            line-height: 1;
+            margin-top: 4px;
+        }
+
+        .timeline-right {
+            flex: 1;
+        }
+
+        .timeline-phase {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .timeline-tasks {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .timeline-task {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .timeline-task::before {
+            content: '';
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--text-faint);
+            flex-shrink: 0;
+        }
+
+        /* ── CALLOUT ────────────────────────────────────── */
+        .callout {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px 20px;
+            display: flex;
+            gap: 14px;
+            margin-bottom: 20px;
+            background: var(--surface);
+        }
+
+        .callout.tip {
+            border-left: 3px solid var(--green);
+        }
+
+        .callout.warn {
+            border-left: 3px solid var(--yellow);
+        }
+
+        .callout.info {
+            border-left: 3px solid var(--blue);
+        }
+
+        .callout-icon {
+            font-size: 15px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .callout-body {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .callout-body strong {
+            color: var(--text);
+        }
+
+        /* ── WORKFLOW TABLE ─────────────────────────────── */
+        .table-wrap {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead tr {
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        th {
+            text-align: left;
+            padding: 10px 16px;
+            font-family: var(--mono);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-faint);
+            font-weight: 400;
+        }
+
+        td {
+            padding: 12px 16px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-subtle);
+            vertical-align: top;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: var(--surface);
+        }
+
+        td:first-child {
+            color: var(--text);
+            font-weight: 500;
+            font-family: var(--mono);
+            font-size: 12px;
+        }
+
+        td code {
+            font-family: var(--mono);
+            font-size: 11px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: 1px 5px;
+            color: var(--blue);
+        }
+
+        /* ── DIVIDER ────────────────────────────────────── */
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 24px 0;
+        }
+
+        /* ── FOOTER ─────────────────────────────────────── */
+        .footer {
+            padding: 32px 0;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-copy {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-faint);
+        }
+
+        .footer-badges {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* ── SCROLLBAR ──────────────────────────────────── */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        /* ── RESPONSIVE ─────────────────────────────────── */
+        @media (max-width: 600px) {
+            .stack-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-title {
+                font-size: 28px;
+            }
+
+            .section-body {
+                padding-left: 0;
+            }
+
+            .topbar-title {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+        <div class="wrapper">
+            <div class="topbar-inner">
+                <div class="topbar-left">
+                    <div class="logo">
+                        <svg viewBox="0 0 24 24" fill="white">
+                            <path d="M12 2L2 19.5h20L12 2z" /></svg>
+                    </div>
+                    <span class="topbar-title"><span>collaborative-editor</span> / spec</span>
+                </div>
+                <div style="display:flex;gap:8px">
+                    <span class="badge green"><span class="badge-dot"></span>TypeScript Strict</span>
+                    <span class="badge blue">v1.0.0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HERO -->
+    <div class="wrapper">
+        <div class="hero">
+            <div class="hero-label">Test Technique · NiyiExpertise · Frontend 2026</div>
+            <h1 class="hero-title">Collaborative<br /><em>Text Editor</em></h1>
+            <p class="hero-sub">
+                Éditeur de texte collaboratif temps réel simulant des interactions multi-utilisateurs.
+                Architecture React 19, CRDT via Yjs, zéro re-render global lors de la saisie.
+            </p>
+            <div class="hero-meta">
+                <span class="badge"><span class="badge-dot" style="background:#60a5fa"></span>React 19 + Vite</span>
+                <span class="badge">Yjs + CodeMirror 6</span>
+                <span class="badge">Zustand</span>
+                <span class="badge">Tailwind CSS</span>
+                <span class="badge">Playwright</span>
+                <span class="badge">Storybook 8</span>
+            </div>
+            <div class="hero-actions" style="margin-top: 32px; display: flex; gap: 12px; flex-wrap: wrap;">
+                <a href="https://enockmigjr.github.io/collaborative-editor/" target="_blank" style="padding: 10px 16px; background: var(--accent); color: var(--bg); text-decoration: none; font-weight: 500; border-radius: 6px; font-family: var(--mono); font-size: 13px; transition: opacity 0.2s;">🚀 Voir le Live Demo</a>
+                <a href="https://github.com/enockmigjr/collaborative-editor" target="_blank" style="padding: 10px 16px; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); text-decoration: none; font-weight: 500; border-radius: 6px; font-family: var(--mono); font-size: 13px; transition: background 0.2s;">💻 Code Source GitHub</a>
+                <a href="https://enockmigjr.github.io/collaborative-editor/storybook/" target="_blank" style="padding: 10px 16px; background: #ff478515; color: #ff4785; border: 1px solid #ff478550; text-decoration: none; font-weight: 500; border-radius: 6px; font-family: var(--mono); font-size: 13px; transition: background 0.2s;">📚 Storybook Docs</a>
+            </div>
+        </div>
+
+        <!-- ── 01. STACK ── -->
+        <div class="section">
+            <div class="section-header">
+                <span class="section-num">01</span>
+                <h2 class="section-title">Stack technique</h2>
+            </div>
+            <div class="section-body">
+                <div class="stack-grid">
+                    <div class="stack-item">
+                        <span class="stack-cat">Build</span>
+                        <span class="stack-val">Vite + React 19</span>
+                        <span class="stack-reason">Rapide, pas d'overhead SSR inutile. 100% client-side.</span>
+                    </div>
+                    <div class="stack-item">
+                        <span class="stack-cat">Collaboration</span>
+                        <span class="stack-val">Yjs + y-codemirror.next</span>
+                        <span class="stack-reason">CRDT natif. Curseurs sans re-render React via Decorations.</span>
+                    </div>
+                    <div class="stack-item">
+                        <span class="stack-cat">Éditeur</span>
+                        <span class="stack-val">CodeMirror 6</span>
+                        <span class="stack-reason">Modulaire, extensible. API Decorations pour les curseurs.</span>
+                    </div>
+                    <div class="stack-item">
+                        <span class="stack-cat">State Management</span>
+                        <span class="stack-val">Zustand</span>
+                        <span class="stack-reason">Selectors granulaires. Zéro boilerplate vs Redux.</span>
+                    </div>
+                    <div class="stack-item">
+                        <span class="stack-cat">Styling</span>
+                        <span class="stack-val">Tailwind CSS (pur)</span>
+                        <span class="stack-reason">Pas de Shadcn. Montre la maîtrise CSS directe.</span>
+                    </div>
+                    <div class="stack-item">
+                        <span class="stack-cat">Faux utilisateurs</span>
+                        <span class="stack-val">@faker-js/faker</span>
+                        <span class="stack-reason">Noms, avatars et comportements réalistes pour les bots.</span>
+                    </div>
+                    <div class="stack-item">
+                        <span class="stack-cat">Tests unitaires</span>
+                        <span class="stack-val">Vitest + Testing Library</span>
+                        <span class="stack-reason">Intégration native Vite. Rapide, compatible jsdom.</span>
+                    </div>
+                    <div class="stack-item">
+                        <span class="stack-cat">Tests E2E</span>
+                        <span class="stack-val">Playwright</span>
+                        <span class="stack-reason">Standard industrie. Cross-browser, screenshots auto.</span>
+                    </div>
+                    <div class="stack-item">
+                        <span class="stack-cat">Documentation</span>
+                        <span class="stack-val">Storybook 8</span>
+                        <span class="stack-reason">Documentation vivante. Déployée automatiquement sur GH Pages.</span>
+                    </div>
+                    <div class="stack-item">
+                        <span class="stack-cat">Git Hooks</span>
+                        <span class="stack-val">Husky + lint-staged</span>
+                        <span class="stack-reason">Lint + format obligatoires avant chaque commit.</span>
+                    </div>
+                    <div class="stack-item">
+                        <span class="stack-cat">Utilitaires</span>
+                        <span class="stack-val">date-fns + lucide-react</span>
+                        <span class="stack-reason">Léger, composable. Pas de moment.js.</span>
+                    </div>
+                    <div class="stack-item">
+                        <span class="stack-cat">Types</span>
+                        <span class="stack-val">TypeScript Strict</span>
+                        <span class="stack-reason">noImplicitAny, exactOptionalPropertyTypes, noUnusedLocals.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── 02. ARCHITECTURE ── -->
+        <div class="section">
+            <div class="section-header">
+                <span class="section-num">02</span>
+                <h2 class="section-title">Structure du projet</h2>
+            </div>
+            <div class="section-body">
+                <div class="filetree">
+                    <div class="filetree-header">
+                        <div class="filetree-dot" style="background:#ff5f57"></div>
+                        <div class="filetree-dot" style="background:#febc2e"></div>
+                        <div class="filetree-dot" style="background:#28c840"></div>
+                        <span class="filetree-title">collaborative-editor/</span>
+                    </div>
+                    <pre>
+<span class="dir">collaborative-editor/</span>
+├── <span class="dir">.github/</span>
+│   └── <span class="dir">workflows/</span>
+│       ├── <span class="file">ci.yml</span>              <span class="comment"># lint → typecheck → tests → E2E</span>
+│       ├── <span class="file">deploy.yml</span>          <span class="comment"># deploy App GH Pages sur push main</span>
+│       ├── <span class="file">storybook.yml</span>       <span class="comment"># deploy Docs GH Pages sur push main</span>
+│       └── <span class="file">release.yml</span>         <span class="comment"># tag v* → GitHub Release auto</span>
+├── <span class="dir">.husky/</span>
+│   ├── <span class="file">pre-commit</span>          <span class="comment"># lint-staged</span>
+│   └── <span class="file">commit-msg</span>          <span class="comment"># commitlint (conventional commits)</span>
+├── <span class="dir">.storybook/</span>
+│   ├── <span class="file">main.ts</span>
+│   └── <span class="file">preview.ts</span>
+├── <span class="dir">docs/</span>
+│   └── <span class="file">ARCHITECTURE.md</span>
+├── <span class="dir">e2e/</span>                    <span class="comment"># Tests Playwright</span>
+│   ├── <span class="file">editor.spec.ts</span>
+│   ├── <span class="file">collaboration.spec.ts</span>
+│   └── <span class="dir">fixtures/</span>
+├── <span class="dir">public/</span>                   <span class="comment"># Assets statiques</span>
+│   └── <span class="file">spec.html</span>             <span class="comment"># Le sujet original du test</span>
+├── <span class="dir">src/</span>
+│   ├── <span class="dir">components/</span>
+│   │   ├── <span class="dir">Header/</span>
+│   │   │   ├── <span class="key">Header.tsx</span>
+│   │   │   ├── <span class="file">Header.stories.tsx</span>
+│   │   │   ├── <span class="file">Header.test.tsx</span>
+│   │   │   ├── <span class="file">DocumentTitle.tsx</span>
+│   │   │   ├── <span class="file">ConnectionStatus.tsx</span>
+│   │   │   ├── <span class="file">UndoRedo.tsx</span>
+│   │   │   └── <span class="file">index.ts</span>
+│   │   ├── <span class="dir">LeftPanel/</span>
+│   │   │   ├── <span class="key">LeftPanel.tsx</span>
+│   │   │   ├── <span class="file">UserCard.tsx</span>
+│   │   │   ├── <span class="file">UserCard.stories.tsx</span>
+│   │   │   └── <span class="file">index.ts</span>
+│   │   ├── <span class="dir">Editor/</span>             <span class="comment"># CodeMirror + Yjs</span>
+│   │   │   ├── <span class="key">Editor.tsx</span>
+│   │   │   ├── <span class="file">Editor.stories.tsx</span>
+│   │   │   ├── <span class="file">Editor.test.tsx</span>
+│   │   │   ├── <span class="file">LatencyBadge.tsx</span>
+│   │   │   └── <span class="file">index.ts</span>
+│   │   ├── <span class="dir">RightPanel/</span>
+│   │   │   ├── <span class="key">RightPanel.tsx</span>
+│   │   │   ├── <span class="file">ActivityLog.tsx</span>
+│   │   │   ├── <span class="file">Chat.tsx</span>
+│   │   │   └── <span class="file">index.ts</span>
+│   │   └── <span class="dir">Footer/</span>
+│   │       ├── <span class="key">Footer.tsx</span>
+│   │       └── <span class="file">index.ts</span>
+│   ├── <span class="dir">simulation/</span>
+│   │   ├── <span class="file">networkSimulator.ts</span>  <span class="comment"># latence 100-1500ms, perte 1%</span>
+│   │   ├── <span class="file">userSimulator.ts</span>     <span class="comment"># bots avec setInterval</span>
+│   │   └── <span class="file">botBehaviors.ts</span>      <span class="comment"># scénarios de frappe</span>
+│   ├── <span class="dir">store/</span>
+│   │   ├── <span class="file">useConnectionStore.ts</span>
+│   │   ├── <span class="file">useLogsStore.ts</span>
+│   │   └── <span class="file">useUIStore.ts</span>        <span class="comment"># dark mode, onglet actif</span>
+│   ├── <span class="dir">hooks/</span>
+│   │   ├── <span class="file">useCollaboration.ts</span>  <span class="comment"># init Yjs + awareness</span>
+│   │   ├── <span class="file">useNetworkSim.ts</span>
+│   │   └── <span class="file">useUndoRedo.ts</span>       <span class="comment"># UndoManager Yjs</span>
+│   ├── <span class="dir">lib/</span>
+│   │   ├── <span class="file">yjsProvider.ts</span>       <span class="comment"># Mock Provider avec file d'attente</span>
+│   │   ├── <span class="file">codemirrorSetup.ts</span>   <span class="comment"># extensions CM6</span>
+│   │   └── <span class="file">constants.ts</span>
+│   ├── <span class="dir">types/</span>
+│   │   ├── <span class="file">user.ts</span>
+│   │   ├── <span class="file">log.ts</span>
+│   │   ├── <span class="file">operation.ts</span>
+│   │   ├── <span class="file">network.ts</span>
+│   │   └── <span class="file">index.ts</span>             <span class="comment"># barrel export</span>
+│   ├── <span class="dir">styles/</span>
+│   │   └── <span class="file">globals.css</span>
+│   ├── <span class="file">App.tsx</span>
+│   └── <span class="file">main.tsx</span>
+├── <span class="file">.eslintrc.json</span>
+├── <span class="file">.prettierrc</span>
+├── <span class="file">commitlint.config.js</span>
+├── <span class="file">playwright.config.ts</span>
+├── <span class="file">tailwind.config.ts</span>
+├── <span class="file">tsconfig.json</span>
+├── <span class="file">vite.config.ts</span>
+├── <span class="file">CONTRIBUTING.md</span>
+├── <span class="file">LICENSE</span>
+└── <span class="file">package.json</span></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── 03. FONCTIONNALITÉS ── -->
+        <div class="section">
+            <div class="section-header">
+                <span class="section-num">03</span>
+                <h2 class="section-title">Fonctionnalités</h2>
+            </div>
+            <div class="section-body">
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <span class="feature-icon">🟢</span>
+                        <span class="feature-text"><strong>Collaboration CRDT</strong> — 3 bots simulés via Yjs. Convergence mathématiquement garantie sans serveur central.</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🟡</span>
+                        <span class="feature-text"><strong>Simulation réseau</strong> — Latence aléatoire 100–1500ms. Perte de paquets à 1%. Statut de connexion dynamique.</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🔵</span>
+                        <span class="feature-text"><strong>Curseurs multiples</strong> — Via CodeMirror Decorations. Zéro re-render React lors du déplacement des curseurs.</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">⚡</span>
+                        <span class="feature-text"><strong>Undo / Redo</strong> — Natif via Yjs UndoManager. Scope utilisateur uniquement (les actions des bots ne sont pas undoable).</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">📋</span>
+                        <span class="feature-text"><strong>Journal d'activité</strong> — Log chronologique de toutes les opérations. Virtualisé pour éviter les fuites mémoire.</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">💬</span>
+                        <span class="feature-text"><strong>Module de chat</strong> — Onglet dans le panneau droit. Messages attribués avec couleur d'avatar.</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🌙</span>
+                        <span class="feature-text"><strong>Dark mode</strong> — Toggle global. Classe <code>dark</code> sur <code>html</code>. Persisté en localStorage.</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">📱</span>
+                        <span class="feature-text"><strong>Responsive</strong> — Panneaux latéraux collapsibles sur mobile. Layout flexible via Tailwind.</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🔢</span>
+                        <span class="feature-text"><strong>Numérotation de lignes</strong> — Extension CodeMirror native. Mise à jour sans re-render React.</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">📊</span>
+                        <span class="feature-text"><strong>Console de débogage</strong> — Footer affichant taille doc, latence simulée, mode de synchronisation en temps réel.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── 04. FLUX DE DONNÉES ── -->
+        <div class="section">
+            <div class="section-header">
+                <span class="section-num">04</span>
+                <h2 class="section-title">Flux de données</h2>
+            </div>
+            <div class="section-body">
+                <div class="callout info">
+                    <span class="callout-icon">ℹ️</span>
+                    <div class="callout-body">
+                        L'état du texte ne vit <strong>jamais dans un useState React</strong>. Il vit dans l'instance Yjs/CodeMirror.
+                        React ne re-rend que les composants UI périphériques (header, logs, footer) via Zustand selectors.
+                    </div>
+                </div>
+
+                <div class="codeblock">
+                    <div class="codeblock-header">
+                        <span class="codeblock-filename">Flux de données — Architecture</span>
+                        <span class="codeblock-lang">Diagram</span>
+                    </div>
+                    <pre>
+<span class="cm">Utilisateur tape</span>
+      │
+      ▼
+<span class="fn">CodeMirror</span> <span class="cm">(DOM natif — aucun React ici)</span>
+      │ update binaire Yjs
+      ▼
+<span class="ty">MockNetworkProvider</span>
+      │ setTimeout(<span class="num">100</span>–<span class="num">1500</span>ms)  ←── <span class="num">1%</span> probabilité de drop
+      ▼
+<span class="fn">sharedDoc</span> <span class="cm">(Y.Doc commun)</span>
+      │
+      ├──► <span class="ty">BotSimulator</span> (setInterval) ──► lit/écrit dans sharedDoc
+      │
+      ▼
+<span class="ty">MockNetworkProvider</span> <span class="cm">(remote update)</span>
+      │ setTimeout (latence retour)
+      ▼
+<span class="fn">localDoc</span> ──► <span class="fn">CodeMirror</span> ──► DOM <span class="cm">(curseurs via Decorations)</span>
+      │
+      └──► <span class="ty">Zustand</span> <span class="cm">(latence, statut)</span> ──► <span class="fn">Header</span> / <span class="fn">Footer</span> React</pre>
+                </div>
+
+            </div>
+        </div>
+
+
+
+        <!-- ── 05. TESTS ── -->
+        <div class="section">
+            <div class="section-header">
+                <span class="section-num">05</span>
+                <h2 class="section-title">Stratégie de tests</h2>
+            </div>
+            <div class="section-body">
+                <div class="table-wrap" style="margin-bottom:24px">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Niveau</th>
+                                <th>Outil</th>
+                                <th>Ce qui est testé</th>
+                                <th>Commande</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Unitaire</td>
+                                <td>Vitest + Testing Library</td>
+                                <td>Composants isolés, hooks, stores Zustand</td>
+                                <td><code>pnpm test</code></td>
+                            </tr>
+                            <tr>
+                                <td>Composants</td>
+                                <td>Storybook 8</td>
+                                <td>Tous les états visuels (Connecté, Syncing, Déco...)</td>
+                                <td><code>pnpm storybook</code></td>
+                            </tr>
+                            <tr>
+                                <td>E2E</td>
+                                <td>Playwright</td>
+                                <td>Flux complets : titre éditable, dark mode, bots, logs</td>
+                                <td><code>pnpm test:e2e</code></td>
+                            </tr>
+                            <tr>
+                                <td>Couverture</td>
+                                <td>Vitest coverage</td>
+                                <td>Rapport HTML + badge CI</td>
+                                <td><code>pnpm test:coverage</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="callout warn">
+                    <span class="callout-icon">⚠️</span>
+                    <div class="callout-body">
+                        <strong>Règle :</strong> Tout nouveau composant doit avoir sa story Storybook + au moins un test unitaire.
+                        Aucun <code>any</code>, aucun <code>// @ts-ignore</code> accepté. Le CI bloque les PRs qui violent ces règles.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── 06. CI/CD ── -->
+        <div class="section">
+            <div class="section-header">
+                <span class="section-num">06</span>
+                <h2 class="section-title">CI / CD — GitHub Actions</h2>
+            </div>
+            <div class="section-body">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Workflow</th>
+                                <th>Trigger</th>
+                                <th>Jobs (dans l'ordre)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>ci.yml</td>
+                                <td>Push main/develop · PR</td>
+                                <td>Lint → Typecheck → Unit Tests → E2E (Chromium + Firefox)</td>
+                            </tr>
+                            <tr>
+                                <td>storybook.yml</td>
+                                <td>Push main uniquement</td>
+                                <td>Build Storybook → Deploy GitHub Pages</td>
+                            </tr>
+                            <tr>
+                                <td>release.yml</td>
+                                <td>Tag <code>v*</code></td>
+                                <td>Create GitHub Release avec notes auto-générées</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── 07. GIT ── -->
+        <div class="section">
+            <div class="section-header">
+                <span class="section-num">07</span>
+                <h2 class="section-title">Convention Git</h2>
+            </div>
+            <div class="section-body">
+                <div class="table-wrap" style="margin-bottom:24px">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Branche</th>
+                                <th>Usage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>main</td>
+                                <td>Production — protégée, merge via PR uniquement</td>
+                            </tr>
+                            <tr>
+                                <td>develop</td>
+                                <td>Intégration — branche de travail principale</td>
+                            </tr>
+                            <tr>
+                                <td>feat/nom</td>
+                                <td>Nouvelle fonctionnalité</td>
+                            </tr>
+                            <tr>
+                                <td>fix/nom</td>
+                                <td>Correction de bug</td>
+                            </tr>
+                            <tr>
+                                <td>chore/nom</td>
+                                <td>Maintenance, deps, config</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="codeblock">
+                    <div class="codeblock-header">
+                        <span class="codeblock-filename">Exemples de commits conventionnels</span>
+                        <span class="codeblock-lang">Git</span>
+                    </div>
+                    <pre>
+<span class="kw">feat</span>(editor): add line numbers to CodeMirror
+<span class="kw">fix</span>(simulation): prevent bot updates after component unmount
+<span class="kw">perf</span>(store): memoize log selectors to avoid re-renders
+<span class="kw">test</span>(e2e): add dark mode toggle playwright spec
+<span class="kw">chore</span>(deps): upgrade yjs to 13.6.19
+<span class="kw">docs</span>(arch): document CRDT conflict resolution strategy</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── 08. LIVRABLES ── -->
+        <div class="section">
+            <div class="section-header">
+                <span class="section-num">08</span>
+                <h2 class="section-title">Livrables attendus</h2>
+            </div>
+            <div class="section-body">
+                <div class="callout tip">
+                    <span class="callout-icon">📦</span>
+                    <div class="callout-body">
+                        <strong>GitHub :</strong> Dépôt public avec CI verte, Storybook déployé sur GitHub Pages, README avec badges, commits conventionnels, branche main protégée.
+                    </div>
+                </div>
+                <div class="callout info">
+                    <span class="callout-icon">🎬</span>
+                    <div class="callout-body">
+                        <strong>Vidéo 3–4 min (Google Drive) :</strong> (1) Explication architecture CRDT + MockProvider. (2) Démo fonctionnelle avec bots actifs. (3) React DevTools Profiler montrant zéro re-render global. (4) Justification des choix Yjs vs OT custom.
+                    </div>
+                </div>
+                <div class="callout warn">
+                    <span class="callout-icon">📧</span>
+                    <div class="callout-body">
+                        <strong>Email :</strong> recrutement@niyiexpertise.com · Objet : <code>Test de recrutement - Frontend - 2026 - Nom&Prénom</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <span class="footer-copy">© 2026 — Spec collaborative-editor · NiyiExpertise</span>
+            <div class="footer-badges">
+                <span class="badge green"><span class="badge-dot"></span>TypeScript Strict</span>
+                <span class="badge">MIT License</span>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
