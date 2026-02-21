@@ -1,0 +1,107 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --color-vercel-black: var(--vercel-black);
+    --color-vercel-gray: var(--vercel-gray);
+    --color-vercel-gray-light: var(--vercel-gray-light);
+    --color-vercel-border: var(--vercel-border);
+    --color-vercel-accent: #0070f3;
+    --color-vercel-text: var(--vercel-text);
+    --color-vercel-muted: var(--vercel-muted);
+}
+
+:root {
+    --vercel-black: #ffffff;
+    --vercel-gray: #fafafa;
+    --vercel-gray-light: #eaeaea;
+    --vercel-border: #eaeaea;
+    --vercel-text: #000000;
+    --vercel-muted: #525252;
+}
+
+:root.dark {
+    --vercel-black: #000000;
+    --vercel-gray: #111111;
+    --vercel-gray-light: #333333;
+    --vercel-border: #333333;
+    --vercel-text: #ededed;
+    --vercel-muted: #a3a3a3;
+}
+
+@layer base {
+    body {
+        @apply bg-vercel-black text-vercel-text font-sans antialiased;
+    }
+}
+
+.cm-editor {
+    background-color: transparent !important;
+    color: var(--vercel-text) !important;
+    height: 100%;
+}
+
+.cm-content {
+    caret-color: var(--vercel-text) !important;
+}
+
+.cm-cursor,
+.cm-dropCursor {
+    border-left-color: var(--vercel-text) !important;
+}
+
+.cm-scroller {
+    overflow-x: hidden !important;
+}
+
+.cm-gutters {
+    background-color: #111 !important;
+    color: #a3a3a3 !important;
+    border-right: 1px solid #333 !important;
+}
+
+.cm-activeLine {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.cm-activeLineGutter {
+    background-color: #333 !important;
+    color: #fff !important;
+}
+
+.yRemoteSelection {
+    background-color: rgba(0, 112, 243, 0.3);
+}
+
+.yRemoteSelectionHead {
+    position: absolute;
+    border-left: 2px solid #0070f3;
+    height: 1.2em;
+    display: inline-block;
+    z-index: 10;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--vercel-border);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--vercel-muted);
+}
+
+.scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--vercel-border) transparent;
+}
