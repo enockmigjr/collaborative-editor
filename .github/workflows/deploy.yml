@@ -1,4 +1,4 @@
-name: Storybook
+name: Deploy App
 
 on:
   push:
@@ -8,7 +8,7 @@ permissions:
   contents: write
 
 jobs:
-  storybook:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,10 +16,9 @@ jobs:
         with: { node-version: 20 }
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
-      - run: pnpm run build-storybook
+      - run: pnpm run build
       - uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: storybook-static
-          destination_dir: storybook
+          publish_dir: dist
           keep_files: true
