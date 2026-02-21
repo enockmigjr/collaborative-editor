@@ -43,6 +43,11 @@ export const useCollaboration = (currentUser: User) => {
 
     const typingTimeouts = new Map<string, ReturnType<typeof setTimeout>>()
 
+    const pendingLogs = new Map<
+      string,
+      { insert: number; delete: number; timeout: NodeJS.Timeout }
+    >()
+
     // 4. Écouter les modifications pour le journal
     const handleUpdate = (event: Y.YTextEvent, transaction: Y.Transaction) => {
       let action: OperationType = 'insert'
@@ -85,19 +90,40 @@ export const useCollaboration = (currentUser: User) => {
             userName = botUser.name
             userColor = botUser.color
           } else {
-            // Fallback pour une origine inconnue (ne devrait pas arriver avec les bots)
             userName = `Bot ${originId.substring(0, 4)}`
             userColor = '#666'
           }
         }
 
-        addLog({
-          userId: originId,
-          userName,
-          userColor,
-          type: action,
-          details: `${action === 'insert' ? 'Inséré' : 'Supprimé'} ${count} caractère(s)`,
-        })
+        // Évite d'inonder le store Zustand et de faire crasher React.
+        // On cumule les frappes silencieusement et on logge à la fin de la phrase.
+        const currentPending = pendingLogs.get(originId) || {
+          insert: 0,
+          delete: 0,
+          timeout: setTimeout(() => {}, 0),
+        }
+        const safeAction = action as OperationType
+        if (safeAction === 'insert') currentPending.insert += count
+        if (safeAction === 'delete') currentPending.delete += count
+
+        clearTimeout(currentPending.timeout)
+        currentPending.timeout = setTimeout(() => {
+          const totalLogs = []
+          if (currentPending.insert > 0) totalLogs.push(`${currentPending.insert} ajout(s)`)
+          if (currentPending.delete > 0) totalLogs.push(`${currentPending.delete} suppression(s)`)
+
+          addLog({
+            userId: originId,
+            userName,
+            userColor,
+            type: currentPending.insert >= currentPending.delete ? 'insert' : 'delete',
+            details: `A modifié le texte : ${totalLogs.join(', ')}`,
+          })
+          pendingLogs.delete(originId)
+        }, 2000)
+
+        pendingLogs.set(originId, currentPending)
+
         incrementTotalOps(originId)
       }
     }

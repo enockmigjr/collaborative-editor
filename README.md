@@ -15,6 +15,7 @@
 ![Screenshot de l'application avec des activitées](docs/screenshot.png)
 
 ![Screenshot de l'application avec des chats](docs/screenshot2.png)
+![L'Architecture Globale et la Simulation Yjs](docs/mermaid.png)
 
 ---
 
