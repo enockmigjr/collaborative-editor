@@ -1,0 +1,1 @@
+import{c as r}from"./react-D996PLU5.js";const a=r(t=>({logs:[],totalOps:0,userOps:{},addLog:o=>t(s=>({logs:[{...o,id:Math.random().toString(36).substring(7),timestamp:Date.now()},...s.logs].slice(0,100)})),incrementTotalOps:o=>t(s=>({totalOps:s.totalOps+1,userOps:{...s.userOps,[o]:(s.userOps[o]||0)+1}})),clearLogs:()=>t({logs:[],totalOps:0,userOps:{}})}));export{a as u};
