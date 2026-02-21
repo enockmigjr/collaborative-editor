@@ -1,0 +1,1 @@
+import{c}from"./react-C6W-rNNW.js";const n=c(s=>({status:"connected",latencyMs:0,setStatus:t=>s({status:t}),setLatency:t=>s({latencyMs:t})})),a=()=>{const s=n(e=>e.latencyMs),t=n(e=>e.status);return{latencyMs:s,status:t}};export{a as u};
